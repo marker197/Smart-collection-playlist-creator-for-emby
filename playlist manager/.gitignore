@@ -1,0 +1,33 @@
+# Environment variables (contains secrets: API keys, tokens)
+.env
+.env.local
+.env.*.local
+
+# Dependencies (auto-generated, 240+ MB)
+node_modules/
+
+
+# Runtime data
+data/
+
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Git
+.git/
