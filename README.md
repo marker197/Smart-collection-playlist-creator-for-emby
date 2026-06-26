@@ -1,275 +1,282 @@
-# Smart Playlist Generator - Backend Server
+# Emby Playlist Manager
 
-Node.js backend server for Smart Playlist Generator & Chronological Playlist apps.
+Powerful web app for managing Emby collections with smart rules, Trakt/MDBlists sync, and chronological ordering.
+
+![Node.js](https://img.shields.io/badge/Node.js-14%2B-green)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+
+---
+
+## Features
+
+✨ **Smart Collections** — Create rule-based playlists with AND/OR logic (genre, year, rating, actors, etc.)
+
+🔄 **Bi-Directional Sync** — Keep Emby collections in sync with Trakt and MDBlists automatically
+
+📺 **Chronological Ordering** — Build franchise timelines from TMDB or upload custom order
+
+📊 **Analytics Dashboard** — View collection stats, genre breakdown, watched status, duplicate detection
+
+🎬 **Watched Status Sync** — Push watched items from Emby to Trakt/MDBlists in real-time
+
+⏰ **Scheduled Automation** — Cron-based rules to keep collections fresh, auto-add missing to Radarr
+
+🖼️ **Artwork Management** — Cache posters from fanart.tv, TMDB, and Emby
+
+---
 
 ## Quick Start
 
 ### Prerequisites
-- latest version of Node.js installed
-- Emby server running
-- Frontend apps running (or accessible)
+- **Node.js 14+** — [Download](https://nodejs.org/)
+- **Emby Server** — Running and accessible
 
-### Installation
+### Install (5 minutes)
 
-1. **Install dependencies:**
+See **[INSTALL.md](./INSTALL.md)** for detailed setup:
+
 ```bash
+# 1. Download ZIP or clone repo
+git clone <this-repo>
+cd emby-playlist-manager
+
+# 2. Install dependencies
 npm install
-```
 
-2. **Create `.env` file:**
-```bash
-cp .env.example .env
+# 3. Configure
+cp example.env .env
+# Edit .env with your Emby server details
 
-If using mac.. 
-With the file open in TextEdit, click Format in the top menu bar.
-Click Make Plain Text (or press Shift + Command + T).Click OK on the warning prompt.Go to File > Save As (hold down the Option key while clicking the File menu to reveal "Save As").Name the file exactly .env and uncheck any box that says "If no extension is provided, use .txt".
-```
-
-3. **Edit `.env` with your settings:**
-```
-EMBY_URL=http://192.168.1.xxx:8096
-EMBY_TOKEN=your_api_token
-EMBY_USER_ID=your_user_id
-```
-
-4. **Start the server:**
-```bash
-npm start
-```
-
-The server will start on `http://localhost:5001`
-
----
-
-## Development
-
-For development with auto-restart on file changes:
-
-```bash
-npm install -g nodemon
-npm run dev
+# 4. Start
+./start-playlist-manager.sh
+# Opens http://localhost:5001
 ```
 
 ---
 
-## Configuration
+## Usage
 
-### Environment Variables
+### Collections Tab
+Browse all Emby collections, search, sort, and quick-open in Emby. Color-coded by source (Trakt, MDBlists, Smart, etc.)
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| EMBY_URL | Your Emby server URL | http://192.168.1.xxx:8096 |
-| EMBY_TOKEN | Emby API token | your_token_here |
-| EMBY_USER_ID | Your Emby user ID | your_user_id |
-| PORT | Server port | 5001 |
-| NODE_ENV | Environment | development or production |
-| LOG_LEVEL | Logging level | debug, info, warn, error |
-| FRONTEND_URL | Frontend URL for CORS | http://localhost:3000 |
+### Smart Sync Tab
+1. Create rule with conditions (genre, year, rating, etc.)
+2. Test rule to see matches
+3. Create collection or schedule daily/weekly refresh
+4. Optional: Auto-publish to Trakt/MDBlists
 
-### Getting Emby API Token
+### Import Tab
+1. Connect Trakt/MDBlists (via Settings)
+2. Browse your lists
+3. Preview matches in Emby library
+4. Create collection (imports as BoxSet)
+5. Auto-sync on interval to catch new items
 
-1. In Emby, go to **Settings → Dashboard → API Keys**
-2. Create a new API key
-3. Copy the token and add to `.env`
+### Franchise Tab
+1. Select Emby playlist
+2. Choose franchise name (built-in TMDB or upload CSV)
+3. Refresh to reorder chronologically
+4. Fine-tune with drag-and-drop
+5. Save back to Emby
 
+### Analytics Tab
+- Collection statistics (total, sizes, empty, duplicates)
+- Genre breakdown (pie chart)
+- Release year trends (bar chart)
+- Cleanup report with clickable items
 
+### Settings Tab
+- Connect/test Emby server
+- Connect Trakt (OAuth)
+- Connect MDBlists (API key)
+- Add Radarr servers (auto-add missing)
+- Enable/disable features
+- Backup/restore
 
 ---
 
 ## API Endpoints
 
-### Health & Status
-```
-GET /api/health              # Check server status
-GET /api/config              # Get server configuration
-```
+50+ REST API endpoints for:
+- Collection management (CRUD)
+- Rule evaluation & scheduling
+- Trakt/MDBlists sync
+- Watched status tracking
+- Image caching
+- Radarr integration
 
-### Smart Playlist
-```
-GET  /api/smart/rules                    # List rules
-POST /api/smart/schedules                # Create schedule
-GET  /api/smart/schedules                # List schedules
-GET  /api/smart/schedules/:id            # Get schedule details
-PUT  /api/smart/schedules/:id            # Update schedule
-DELETE /api/smart/schedules/:id          # Delete schedule
-POST /api/smart/schedules/:id/run        # Execute immediately
-GET  /api/smart/history                  # Get execution history
-POST /api/smart/test-email               # Send test email
-```
-
-### Chronological Playlist
-```
-POST /api/chrono/create                  # Create collection
-GET  /api/chrono/collections             # List collections
-POST /api/chrono/refresh/:id             # Refresh collection
-POST /api/chrono/update-description/:id  # Update description
-```
+See **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** for complete API documentation.
 
 ---
 
-## Project Structure
+## Architecture
 
-```
-backend/
-├── server.js                    # Main Express app
-├── package.json                 # Dependencies
-├── .env.example                 # Environment template
-├── services/
-│   ├── emby-client.js          # Emby API wrapper
-│   ├── rules-engine.js         # Rule evaluation
-│   ├── scheduler.js            # Cron job manager
-│   ├── email-service.js        # Gmail notifications
-│   └── logger.js               # Logging utility
-├── data/                        # Persistent data
-│   ├── schedules.json          # Stored schedules
-│   ├── executions.json         # Execution history
-│   └── config.json             # Runtime config
-└── logs/                        # Server logs
-    └── server-*.log            # Daily log files
-```
+### Frontend
+- **Single-file HTML/JS app** (3,969 lines)
+- No framework dependencies (vanilla JS)
+- All state in `localStorage`
+- Communicates via `/api/*` endpoints
+
+### Backend
+- **Express.js server** on port 5001 (2,605 lines)
+- Modular service architecture:
+  - `emby-client.js` — Emby API wrapper
+  - `list-sync-service.js` — Trakt/MDBlists sync engine
+  - `image-service.js` — Artwork caching
+  - `rules-engine.js` — Rule evaluation (AND/OR logic)
+  - `scheduler.js` — Cron job management
+  - `logger.js` — Logging
+  - Plus: email, MDBlists, image services
+
+### Data Storage
+- `data/smart-collections.json` — Smart collection registry
+- `data/schedules.json` — Cron schedules
+- `data/chrono-collections.json` — Imported collections metadata
+- `data/images/` — Cached artwork (safe to delete)
 
 ---
 
-## Services
+## Configuration
 
-### EmbyClient
-Handles all Emby API communication:
-- Fetching library items
-- Creating/updating collections
-- Managing metadata
+### Required (.env)
+```
+EMBY_URL=http://192.168.1.90:8096
+EMBY_TOKEN=your-api-key
+EMBY_USER_ID=your-user-id
+TMDB_API_KEY=your-tmdb-key
+```
 
-### RulesEngine
-Evaluates Smart Playlist rules:
-- AND/OR logic evaluation
-- Condition matching (genre, rating, year, actor, etc.)
-- Filtering library items
+### Optional
+- `TRAKT_CLIENT_ID` / `TRAKT_CLIENT_SECRET` — Configured via Settings UI instead
+- `MDBLIST_API_KEY` — Configured via Settings UI instead
 
-### Scheduler
-Manages automated schedule execution:
-- Cron job registration
-- Schedule persistence
-- Execution history tracking
+### Getting API Keys
+- **Emby:** Server → Settings → API Keys → Create
+- **TMDB:** https://www.themoviedb.org/settings/api
+- **Trakt:** https://trakt.tv/oauth/applications → Create App
+- **MDBlists:** https://mdblist.com/ → Settings → API Key
 
-### EmailService
-Sends email notifications via Gmail:
-- Playlist creation notifications
-- Error alerts
-- Test emails
+---
 
-### Logger
-Unified logging system:
-- Console output
-- File-based logging (daily logs)
-- Configurable log levels
+## File Structure
+
+```
+emby-playlist-manager/
+├── emby-playlist-manager.html     ← Main frontend (drop-in)
+├── server.js                      ← Express backend (drop-in)
+├── services/                      ← Modular backend services
+│   ├── emby-client.js
+│   ├── list-sync-service.js
+│   ├── image-service.js
+│   ├── rules-engine.js
+│   ├── scheduler.js
+│   ├── logger.js
+│   ├── email-service.js
+│   └── mdblist-service.js
+├── data/                          ← Runtime data (created on first run)
+│   ├── smart-collections.json
+│   ├── schedules.json
+│   └── chrono-collections.json
+├── package.json                   ← Dependencies
+├── example.env                    ← Environment template
+├── .gitignore                     ← Git exclusions
+├── start-playlist-manager.sh       ← Launcher script
+├── INSTALL.md                     ← Installation guide
+├── QUICK_REFERENCE.md             ← API documentation
+└── README.md                      ← This file
+```
 
 ---
 
 ## Troubleshooting
 
-### "Cannot connect to Emby"
-- Check `EMBY_URL` and `EMBY_TOKEN` in `.env`
-- Verify Emby server is running
-- Check network connectivity
-
-
-
-### "Schedules not executing"
-- Check server logs: `tail -f logs/server-*.log`
-- Verify cron expression is valid
-- Check schedule is enabled
-
-### "High memory usage"
-- Check execution history isn't growing too large
-- Restart server to clear in-memory data
-- Check for stuck cron jobs
-
----
-
-## Logs
-
-Server logs are saved in `logs/` directory with daily files:
-```
-logs/
-├── server-2026-06-16.log
-├── server-2026-06-17.log
-└── ...
-```
-
-View recent logs:
+**Port 5001 already in use?**
 ```bash
-tail -f logs/server-*.log
+pkill -f "node server.js"
 ```
 
----
+**Emby connection fails?**
+- Verify Emby is running
+- Check URL in Settings
+- Generate new API key in Emby
 
-## Deployment
-
-### Local Network (Recommended)
-Just run `npm start` on your local machine. Ensure:
-- Emby server is accessible at the configured URL
-- Frontend apps are on same network or can reach backend
-
-### Remote Server
-For production deployment:
-1. Use a process manager (PM2, systemd, etc.)
-2. Use reverse proxy (nginx) for SSL
-3. Secure environment variables
-4. Set up log rotation
-5. Monitor process health
-
-Example with PM2:
+**Npm install errors?**
 ```bash
-npm install -g pm2
-pm2 start server.js --name smart-playlist-backend
-pm2 save
-pm2 startup
+node --version  # Should be 14+
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
 ```
+
+**Collections not showing?**
+- Refresh browser (Ctrl+Shift+R)
+- Check browser console for errors
+- Verify Emby has collections/playlists
+
+See **[INSTALL.md](./INSTALL.md)** for more troubleshooting.
 
 ---
 
-## Performance Notes
+## Development
 
-- **Max items per query:** 5000 (configurable)
-- **Max execution history:** 1000 per schedule (older deleted)
-- **Concurrent schedules:** Limited by system resources
-- **Response time:** <500ms for most endpoints
+### Project Structure
+- **11,919 lines of code** across 10 files
+- **No external UI framework** (vanilla JS)
+- **Modular services** for easy maintenance
+- **Production-ready** codebase
+
+### Stack
+- **Frontend:** Vanilla JavaScript, HTML, CSS
+- **Backend:** Node.js + Express.js
+- **Database:** JSON files (no database required)
+- **APIs:** Emby, Trakt, MDBlists, TMDB, fanart.tv
+
+### Adding Features
+1. Backend: Add route in `server.js`, service in `services/`
+2. Frontend: Add UI in `emby-playlist-manager.html`, call via `/api/*`
+3. Test with `npm run dev` (requires nodemon)
+
+---
+
+## What's NOT Included
+
+- ❌ `node_modules/` — Run `npm install` to get dependencies
+- ❌ `.env` — Copy `example.env` to `.env` and fill in your secrets
+- ❌ `data/` folder — Created automatically on first run
+- ❌ `logs/` — Generated at runtime, safe to ignore
+- ❌ Gmail notifications — Not currently implemented
 
 ---
 
 ## Security
 
-✅ API keys stored in `.env` (never in code)  
-✅ CORS configured for frontend only  
-✅ Input validation on all endpoints  
-✅ Error messages don't expose sensitive data  
-✅ Logs don't contain tokens/passwords  
-
----
-
-## Support
-
-For issues or questions:
-1. Check logs: `tail -f logs/server-*.log`
-2. Verify `.env` configuration
-3. Test Emby connection: `curl http://your-emby-url/System/Info`
-4. Test email: `POST /api/smart/test-email`
-
----
-
-## Version History
-
-- **v2.0.0** (2026-06-16) - Initial release
-  - Smart Playlist scheduling
-  - Chronological Playlist integration
-  - Email notifications
-  - Execution history
+🔒 **Secrets in .env only** — Never commit `.env` to version control  
+🔒 **API keys server-side** — Radarr, Trakt tokens stored securely  
+🔒 **.gitignore included** — Prevents accidental secret commits  
+🔒 **No external databases** — All data local (JSON files)
 
 ---
 
 ## License
 
-MIT
+MIT — Use freely in personal and commercial projects.
 
 ---
 
-**Last Updated:** 2026-06-16
+## Support
+
+- **Installation stuck?** → See [INSTALL.md](./INSTALL.md)
+- **API questions?** → See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md)
+- **Architecture deep-dive?** → See [PROJECT_BACKUP_MANIFEST.md](./PROJECT_BACKUP_MANIFEST.md)
+- **Issues/bugs?** → Open a GitHub issue
+
+---
+
+## Credits
+
+Built for Emby media server enthusiasts who want powerful collection automation and sync without leaving the browser.
+
+---
+
+**Start here:** [INSTALL.md](./INSTALL.md) → [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) → Enjoy! 🎬

@@ -1,66 +1,134 @@
-# Emby Playlist Manager - Installation Guide
+# Emby Playlist Manager — Install
 
-## What You Need First
-1. **Node.js** — Download from https://nodejs.org (choose the "LTS" version, it's the safe one)
-2. **The Emby Playlist Manager folder** — You already have this
+## Prerequisites
+- Node.js 14+ installed
+- Emby server running and accessible
 
-## Installation Steps
+## 1. Get the Files
 
-### Step 1: Install Node.js
-- Go to https://nodejs.org
-- Click the big green "LTS" button
-- Run the installer like any normal program
-- Click "Next" until it's done
-- Restart your computer when it asks
+**Option A: Download ZIP**
+- Download `emby-playlist-manager-backup.zip` from the repo
+- Decompress into your desired folder
+- Name the folder `emby-playlist-manager`
 
-### Step 2: Check Node.js Works
-- Open Terminal (Mac) or Command Prompt (Windows)
-- Type: `node --version`
-- You should see a version number (like v18.0.0)
-- If you see that, you're good ✓
-
-### Step 3: Set Up the Playlist Manager
-- Open Terminal/Command Prompt
-- Type this (replace the path if yours is different):
+**Option B: Clone with Git**
+```bash
+git clone <your-repo-url>
+cd emby-playlist-manager
 ```
-cd "/Users/USER/Downloads/playlist manager"
-```
-- Press Enter
 
-### Step 4: Install Dependencies
-- Still in Terminal, type:
-```
+## 2. Open Terminal/Command Prompt
+
+**Windows:**
+- Open the `emby-playlist-manager` folder
+- Right-click in empty space → "Open PowerShell window here" (or "Open in Terminal")
+
+**macOS/Linux:**
+- Open the `emby-playlist-manager` folder
+- Right-click → "New Terminal at Folder" (or use Finder → Services)
+- Or: `cd /path/to/emby-playlist-manager`
+
+## 3. Install Dependencies
+
+In the terminal, run:
+```bash
 npm install
 ```
-- This will download some files — it takes a minute or two, don't close it
-- When it finishes, you'll see a prompt again ✓
 
-### Step 5: Start the App
-- Double click or right click open 
-start-playlist-manager.sh
-This will start th node.js terminal run the server.js and open the site. If site doesnt open, see below. 
+## 4. Configure .env File
+
+Open `example.env` in a text editor:
+
+**macOS users:** 
+- Right-click `example.env` → Open With → TextEdit
+- Format menu → "Make Plain Text"
+- Save As... → change filename to `.env` (remove `example`)
+
+**Windows/Linux:**
+- Right-click `example.env` → Open With → Notepad (or VS Code)
+- Save As... → change filename to `.env`
+
+Edit the file and enter your credentials:
+
+### Required:
 ```
-- You should see some green text saying it's running
-- Leave this window open
+EMBY_URL=http://192.168.1.90:8096
+EMBY_TOKEN=your-emby-api-key
+EMBY_USER_ID=your-emby-user-id
+TMDB_API_KEY=your-tmdb-api-key
+```
 
-### Step 6: Open the App
-- Open your web browser
-- Go to: `http://localhost:5001`
-- The app should load
+## 5. Get Your API Keys
 
-## Done!
-That's it. The app is now running.
+### Emby API Key
+1. Go to your Emby server: `http://192.168.1.90:8096`
+2. Settings → API Keys
+3. Click **Create** → copy the key
+4. Paste into `EMBY_TOKEN` in .env
 
-**To stop it:** Press Ctrl+C in the Terminal window (or Cmd+C on Mac)
+### TMDB API Key
+1. Go to https://www.themoviedb.org/settings/api
+2. Create an API key (free tier OK)
+3. Copy and paste into `TMDB_API_KEY` in .env
 
-**To start it again next time:** Just run `node server.js` from the playlist manager folder
+### Trakt App (Optional, for Trakt sync)
+1. Go to https://trakt.tv/oauth/applications
+2. Click **Create Application**
+3. Name: "Emby Playlist Manager"
+4. Redirect URI: `http://localhost:5001`
+5. Save → you'll connect via Settings UI in the app (no key needed in .env)
+
+### MDBlists API Key (Optional, for MDBlists sync)
+1. Go to https://mdblist.com/
+2. Login or create account
+3. Settings → API Key
+4. You'll enter this in Settings UI in the app (no key needed in .env)
+
+## 6. Start the Server
+
+In the terminal, run:
+
+**macOS/Linux:**
+```bash
+chmod +x start-playlist-manager.sh
+./start-playlist-manager.sh
+```
+Browser opens automatically at `http://localhost:5001`
+
+**Windows or Manual:**
+```bash
+node server.js
+```
+Then open browser: `http://localhost:5001`
+
+## 7. First Run
+
+1. Go to **Settings** tab
+2. Click **"Change Emby Server"**
+3. Verify URL, token, userId are correct
+4. Click **"Test Connection"** → should say "Connected"
+5. Save
+
+## Done ✓
+
+You can now:
+- Browse collections in **Collections** tab
+- Create smart rules in **Smart Sync** tab
+- Import from Trakt/MDBlists in **Import** tab (connect via Settings first)
+- Set up Franchise ordering in **Franchise** tab
 
 ## Troubleshooting
 
-**"command not found: node"** → Node.js didn't install. Download and run the installer again.
+**"Cannot find HTML file"** → Make sure `emby-playlist-manager.html` is in the root directory
 
-**"port 5001 already in use"** → Another copy is running. Find the Terminal window running it and press Ctrl+C, then try again.
+**"Emby connection fails"** → Verify Emby is running and token is correct in .env
 
-**"npm: command not found"** → Node.js installer didn't work. Restart your computer and try again.
+**"Port 5001 already in use"** → Kill existing process: `pkill -f "node server.js"`
 
-That's all. Enjoy!
+**"npm install fails"** → Ensure Node 14+ installed: `node --version`
+
+**".env file not found"** → Make sure you renamed `example.env` to `.env` (not `example.env`)
+
+---
+
+See `QUICK_REFERENCE.md` for full API docs and features.
